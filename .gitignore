@@ -1,6 +1,6 @@
 *.pyc
 *~
-__pycache__/*
+*__pycache__/*
 *.swp
 *.sqlite3
 *.map
@@ -18,3 +18,4 @@ pytest.xml
 .hypothesis
 .python-version
 .venv
+.env.test

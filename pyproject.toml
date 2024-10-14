@@ -32,6 +32,10 @@ pytest-asyncio = "*"
 ruff = "*"
 mypy = "*"
 asyncpg-stubs = "*"
+aiosqlite = "*"
+pytest-postgresql = "^6.1.1"
+sqlalchemy-utils = "^0.41.2"
+pytest-mock = "^3.14.0"
 
 [tool.ruff]
 fix = true
@@ -70,8 +74,9 @@ strict = true
 pretty = true
 
 [tool.pytest.ini_options]
-addopts = "--cov=. --cov-report term-missing"
+addopts = "-vv -rA --cov=. --cov-report term-missing"
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
 
 [tool.coverage.report]
 exclude_also = [
@@ -80,3 +85,7 @@ exclude_also = [
 
 [tool.coverage.run]
 concurrency = ["thread","greenlet"]
+source = ["src"]
+omit = ["tests/*","migrations/*",".venv/*", "tests_migrations_script_py_mako"]
+
+

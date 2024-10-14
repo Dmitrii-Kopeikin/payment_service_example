@@ -2,6 +2,5 @@ import enum
 
 
 class TransactionType(enum.Enum):
-    WITHDRAW = 'WITHDRAW'
-    DEPOSIT = 'DEPOSIT'
-
+    WITHDRAW = "WITHDRAW"
+    DEPOSIT = "DEPOSIT"

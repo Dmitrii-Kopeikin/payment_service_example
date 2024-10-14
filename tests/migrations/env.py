@@ -1,21 +1,26 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import URL, create_engine
+from sqlalchemy import URL, engine_from_config, pool
 
 from app.database.models import METADATA
-from app.settings import Settings
-
-
-def get_dsn() -> URL:
-    settings = Settings()
-    db_dsn = settings.db_dsn
-    return db_dsn.set(drivername="postgresql").set(host="localhost")
 
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+
+def get_dsn() -> URL:
+    return URL.create(
+        drivername="postgresql",
+        host="localhost",
+        database="balance_service_db_test",
+        username="postgres",
+        password="postgres",  # noqa: S106
+        port=5433,
+    )
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -24,6 +29,8 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here for 'autogenerate' support
 target_metadata = METADATA
+
+config.set_section_option("alembic", "sqlalchemy.url", get_dsn().render_as_string(hide_password=False))
 
 
 def run_migrations_offline() -> None:
@@ -54,10 +61,26 @@ def run_migrations_online() -> None:
     In this scenario we need to create an Engine and associate a
     connection with the context.
     """
-    connectable = create_engine(get_dsn())
+
+    def process_revision_directives(context, revision, directives) -> None:  # noqa: ARG001, ANN001
+        if config.cmd_opts and config.cmd_opts.autogenerate:
+            script = directives[0]
+            if script.upgrade_ops.is_empty():
+                directives[:] = []
+
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            url=get_dsn(),
+            connection=connection,
+            target_metadata=target_metadata,
+            process_revision_directives=process_revision_directives,
+        )
 
         with context.begin_transaction():
             context.run_migrations()
