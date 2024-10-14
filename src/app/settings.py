@@ -7,7 +7,7 @@ from sqlalchemy import URL
 class Database(BaseModel):
     drivername: str = "postgresql+asyncpg"
     postgres_username: str = "postgres"
-    postgres_password: SecretStr = SecretStr("postgres")
+    postgres_password: SecretStr = SecretStr("")
     host: str = "db"
     port: int = 5432
     db_name: str = "balance_service_db"
